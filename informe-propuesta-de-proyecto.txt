@@ -1,0 +1,118 @@
+UNIVERSIDAD LA SALLE
+Facultad de Ingenierías y Arquitectura
+Carrera Profesional de Ingeniería de Software
+INFORME DE PROPUESTA DE PROYECTO
+AGRUPADOR DE TICKETS DE
+SOPORTE
+Procesamiento de Lenguaje Natural con TF-IDF y K-Means
+Integrantes: Enyelbert Anderson Panta Huaracha
+Fernando Perez del Castillo
+Entregable: Propuesta y selección del dataset
+Característica Descripción
+Producto final Dashboard de agrupamiento de tickets
+Técnicas previstas TF-IDF y K-Means
+Fuente de datos Zenodo: tickets reales anonimizados
+Tecnologías previstas
+Python, scikit-learn y Streamlit
+Arequipa – Perú
+2026
+Procesamiento de Lenguaje Natural Agrupador de tickets
+Índice
+1. Introducción y planteamiento del problema 2
+2. Objetivos 2
+3. Dataset seleccionado: datos reales de Zenodo 2
+3.1. Origen, disponibilidad y contenido . . . . . . . . . . . . . . . . . . . . . . . 2
+3.2. Archivos disponibles y uso previsto . . . . . . . . . . . . . . . . . . . . . . 3
+3.3. Justificación de la elección . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+4. Metodología propuesta 3
+4.1. Preparación de los datos . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+4.2. Técnicas de NLP y agrupamiento . . . . . . . . . . . . . . . . . . . . . . . 3
+5. Entregable y tecnologías 4
+6. Evaluación y pruebas previstas 4
+7. Referencia del dataset 4
+1
+Procesamiento de Lenguaje Natural Agrupador de tickets
+1. Introducción y planteamiento del problema
+Los equipos de soporte reciben incidencias descritas en lenguaje natural. Aunque los
+usuarios pueden reportar un mismo problema, lo hacen con palabras diferentes, lo que
+dificulta identificar temas recurrentes y organizar la atención de solicitudes.
+Se propone desarrollar un agrupador de tickets de soporte que transforme estas
+descripciones en representaciones numéricas y descubra grupos de incidencias similares sin
+utilizar previamente sus categorías. El entregable será un dashboard web que permita
+explorar los clústeres, los tickets asociados y las palabras clave de cada grupo.
+2. Objetivos
+Objetivo general. Desarrollar un prototipo web que agrupe tickets reales de soporte
+técnico según la similitud textual mediante técnicas de procesamiento de lenguaje natural
+y aprendizaje no supervisado.
+Objetivos específicos.
+Preparar y documentar un conjunto de tickets reales anonimizados.
+Aplicar limpieza de texto y representación TF-IDF.
+Implementar el algoritmo K-Means para identificar grupos temáticos.
+Visualizar la distribución de clústeres y sus términos más representativos.
+Evaluar la calidad del agrupamiento y automatizar pruebas del procesamiento.
+3. Dataset seleccionado: datos reales de Zenodo
+3.1. Origen, disponibilidad y contenido
+Se utilizará el dataset Classification of IT Support Tickets, publicado por Leonardo
+Santiago Benitez Pereira en Zenodo, versión 2 (2022). Contiene 2 229 tickets reales
+procedentes de una empresa de soporte informático de la región de Florianópolis, Brasil.
+Tres profesionales de TI clasificaron manualmente los registros en siete categorías durante 2020. Cada incidencia posee un campo de texto libre escrito por quien reportó el
+problema.
+El corpus es multilingüe: contiene principalmente inglés, alemán, portugués y español.
+Sus autores sustituyeron información personal por etiquetas mediante detección automatizada, expresiones regulares y revisión manual. El repositorio señala que el acceso al
+conjunto es abierto y ofrece los archivos para descarga; dado que el campo de licencia
+no identifica claramente una licencia específica en la ficha consultada, verificaremos sus
+condiciones antes de redistribuir los archivos en GitHub.
+Enlace oficial: https://zenodo.org/records/7648117
+Identificador DOI: https://doi.org/10.5281/zenodo.7648117
+2
+Procesamiento de Lenguaje Natural Agrupador de tickets
+3.2. Archivos disponibles y uso previsto
+Archivo Propósito en el proyecto
+X_train.csv y
+X_test.csv
+Textos de los tickets que serán limpiados y vectorizados.
+y_train.csv y
+y_test.csv
+Etiquetas de referencia para análisis posterior; no se introducirán
+al algoritmo de agrupamiento.
+code.py Código de referencia publicado por el autor; no sustituye nuestra
+implementación.
+metrics.txt y
+gráficos
+Material complementario del trabajo original; no representa las métricas de nuestro prototipo.
+Cuadro 1: Archivos relevantes publicados en Zenodo.
+3.3. Justificación de la elección
+Elegimos este conjunto porque contiene incidencias auténticas, posee suficientes registros para una demostración académica, incluye categorías humanas de referencia
+para contrastar la agrupación y ofrece archivos CSV que pueden procesarse con Python.
+Además, su anonimización reduce la exposición de datos personales. Su principal limitación es la diversidad de idiomas, que puede alterar la similitud textual; se analizará el
+idioma de cada registro antes de definir si se agrupa un subconjunto o todo el corpus.
+4. Metodología propuesta
+4.1. Preparación de los datos
+Se descargarán los cuatro CSV principales, se comprobarán sus columnas, valores faltantes, duplicados y distribución por idiomas. Las transformaciones se documentarán en
+scripts reproducibles. Para evitar confusiones en el análisis, se conservarán las etiquetas
+originales únicamente como referencia de evaluación.
+4.2. Técnicas de NLP y agrupamiento
+1. Normalización y tokenización: limpieza de espacios, caracteres no informativos y
+separación del texto en unidades, procurando conservar términos técnicos relevantes.
+2. TF-IDF: transformación de los tickets en vectores que ponderan términos según su
+importancia dentro del corpus. Se probarán unigramas y bigramas.
+3. K-Means: agrupamiento no supervisado de los vectores TF-IDF. El número de clústeres se elegirá mediante experimentación; las siete categorías originales son una referencia, no una obligación.
+4. Interpretación: recuperación de palabras relevantes por clúster y visualización de
+tickets representativos.
+3
+Procesamiento de Lenguaje Natural Agrupador de tickets
+5. Entregable y tecnologías
+El producto será un dashboard desarrollado con Streamlit que permita cargar o utilizar el dataset preparado, ejecutar el agrupamiento, visualizar el tamaño de cada clúster
+y consultar sus palabras clave y tickets. Se prevé utilizar pandas para procesamiento de
+datos y scikit-learn para TF-IDF, K-Means y métricas.
+6. Evaluación y pruebas previstas
+Se calcularán Silhouette Score (separación/cohesión) y Davies-Bouldin (compacidad
+y separación) cuando las condiciones de los grupos lo permitan. Como existen etiquetas humanas, se considerarán ARI y NMI para contrastar particiones, aclarando que
+los grupos descubiertos no tienen por qué coincidir exactamente con las siete categorías
+originales. También se medirá el tiempo de procesamiento y se revisarán ejemplos de
+agrupaciones incorrectas.
+Las pruebas automatizadas con pytest cubrirán entradas vacías, limpieza de texto, integridad de registros y estructura de resultados. No se presentan métricas obtenidas aún:
+se trata de una propuesta previa a la implementación.
+7. Referencia del dataset
+Benitez Pereira, L. S. (2022). Classification of IT Support Tickets (versión 2) [Conjunto
+de datos]. Zenodo. https://doi.org/10.5281/zenodo.7648117.

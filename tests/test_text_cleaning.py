@@ -8,6 +8,7 @@ def test_clean_text_empty_values():
     assert clean_text(None) == ""
     assert clean_text(float("nan")) == ""
     assert clean_text("   ") == ""
+    assert clean_text(pd.NA) == ""
 
 
 def test_clean_text_normalizes_case_punctuation_and_accents():
@@ -29,12 +30,31 @@ def test_clean_text_removes_server_tag():
     assert result == "java installation on"
 
 
+def test_clean_text_removes_any_anonymization_tag():
+    result = clean_text("[USERNAME] [AWS_ACCESS_KEY] [IP_ADDRESS] [IMAGE] acceso")
+    assert result == "acceso"
+
+
 def test_clean_text_removes_boilerplate():
     text = "[TICKET ID] New Support Ticket received - Reset de contrasena"
     result = clean_text(text)
     assert "support" not in result
     assert "received" not in result
     assert "reset de contrasena" in result
+
+
+def test_clean_text_removes_extended_template_fields():
+    result = clean_text(
+        "Initiated by GIT Service Request Requestor [NAME] Comment instalar impresora"
+    )
+    assert result == "instalar impresora"
+
+
+def test_clean_text_removes_structured_form_labels():
+    result = clean_text(
+        "Username: [USERNAME] Firstname: [NAME] Cost Center: 123 Department: IT"
+    )
+    assert result == "123 it"
 
 
 def test_clean_text_drops_short_tokens():

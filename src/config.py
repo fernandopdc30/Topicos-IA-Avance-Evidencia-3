@@ -35,6 +35,10 @@ STOP_WORDS = tuple(
             "os", "as", "um", "uma", "do", "da", "dos", "das", "em", "no", "na",
             "nos", "nas", "sem", "seu", "sua", "ao", "aos", "ele", "ela", "isso",
             "isto", "muito", "ja",
+            # Aleman
+            "der", "die", "das", "den", "dem", "des", "ein", "eine", "einer",
+            "eines", "und", "oder", "von", "zu", "im", "in", "auf", "fur",
+            "mit", "ist", "sind", "war", "wie", "ich", "wir", "sie", "nicht",
         }
     )
 )

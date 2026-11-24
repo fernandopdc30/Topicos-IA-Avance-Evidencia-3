@@ -33,7 +33,11 @@ def main() -> None:
     tickets.to_csv(PROCESSED_TICKETS_PATH, index=False)
 
     print(f"Tickets procesados: {len(tickets)}")
-    print(f"Duplicados de texto: {tickets['text'].duplicated().sum()}")
+    duplicate_count = int(tickets["clean_text"].duplicated().sum())
+    print(
+        f"Duplicados de texto limpio: {duplicate_count} "
+        f"({duplicate_count / len(tickets):.1%})"
+    )
     print("Distribucion por split:")
     print(tickets["split"].value_counts().to_string())
     print("\nCategorias de referencia (no usadas para agrupar):")

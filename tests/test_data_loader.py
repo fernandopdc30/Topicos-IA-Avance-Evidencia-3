@@ -34,3 +34,16 @@ def test_load_raw_tickets_detects_misalignment(tmp_path):
 def test_load_raw_tickets_missing_files(tmp_path):
     with pytest.raises(FileNotFoundError):
         load_raw_tickets(raw_dir=tmp_path)
+
+
+def test_load_raw_tickets_reports_missing_columns(tmp_path):
+    pd.DataFrame({"id": [1], "wrong": ["a"]}).to_csv(
+        tmp_path / "X_train.csv", index=False
+    )
+    pd.DataFrame({"id": [1], "category_truth": ["x"]}).to_csv(
+        tmp_path / "y_train.csv", index=False
+    )
+    _write_pair(tmp_path, "test", [2], ["b"], ["y"])
+
+    with pytest.raises(ValueError, match="text"):
+        load_raw_tickets(raw_dir=tmp_path)

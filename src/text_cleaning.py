@@ -8,12 +8,10 @@ from typing import Iterable, List
 
 import pandas as pd
 
-_PII_TAGS = re.compile(
-    r"\[\s*(?:ticket\s*id|name|company|location|email|phone|date|"
-    r"ip|url|user|password|number|server|group|department|address|"
-    r"hostname|domain|machine|system|path)\s*\]",
-    flags=re.IGNORECASE,
-)
+# El dataset reemplaza informacion sensible con etiquetas entre corchetes. Se
+# elimina cualquier etiqueta, no solo una lista cerrada, para cubrir variantes
+# como [USERNAME], [AWS_ACCESS_KEY], [IP_ADDRESS], [IMAGE] y futuras etiquetas.
+_PII_TAGS = re.compile(r"\[[^\[\]\r\n]{1,80}\]", flags=re.IGNORECASE)
 _URL = re.compile(r"https?://\S+|www\.\S+", flags=re.IGNORECASE)
 _EMAIL = re.compile(r"\S+@\S+\.\S+")
 _HTML = re.compile(r"<[^>]+>")
@@ -23,8 +21,18 @@ _WHITESPACE = re.compile(r"\s+")
 _BOILERPLATE = re.compile(
     r"\b(?:new\s+support\s+ticket\s+received|"
     r"a\s+support\s+ticket\s+was\s+forwarded\s+to\s+your\s+role|"
+    r"a\s+support\s+ticket\s+was\s+forwarded\s+to\s+you|"
     r"support\s+ticket\s+received|"
-    r"ticket\s+was\s+forwarded\s+to\s+your\s+role)\b",
+    r"ticket\s+was\s+forwarded\s+to\s+your\s+role|"
+    r"initiated\s+by\s+git|service\s+request|automated\s+ticket\s+creation|"
+    r"additional\s+information|desired\s+date|requestor|comment)\b",
+    flags=re.IGNORECASE,
+)
+
+_FORM_FIELDS = re.compile(
+    r"\b(?:user\s*name|first\s*name|last\s*name|cost\s*center|"
+    r"expiration\s+date|mailaddress|ailaddress|ip\s+address|access\s+type|"
+    r"department|office|function)\b",
     flags=re.IGNORECASE,
 )
 
@@ -43,12 +51,18 @@ def clean_text(text: object, min_token_length: int = DEFAULT_MIN_TOKEN_LENGTH) -
     URLs, correos, HTML, acentos y signos de puntuacion. El texto resultante
     esta listo para ser vectorizado con TF-IDF.
     """
-    if text is None or (isinstance(text, float) and pd.isna(text)):
+    if text is None:
         return ""
+    try:
+        if bool(pd.isna(text)):
+            return ""
+    except (TypeError, ValueError):
+        pass
 
     value = str(text).lower()
     value = _PII_TAGS.sub(" ", value)
     value = _BOILERPLATE.sub(" ", value)
+    value = _FORM_FIELDS.sub(" ", value)
     value = _URL.sub(" ", value)
     value = _EMAIL.sub(" ", value)
     value = _HTML.sub(" ", value)
